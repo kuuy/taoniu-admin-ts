@@ -16,7 +16,7 @@ type DeleteEventAction = PayloadAction<string>;
 
 const initialState: CalendarState = {
   events: []
-};
+}
 
 const reducers = {
   getEvents(state: CalendarState, action: GetEventsAction): void {
@@ -45,6 +45,6 @@ export const slice = createSlice({
   name: 'calendar',
   initialState,
   reducers
-});
+})
 
-export const { reducer } = slice;
+export const { reducer } = slice

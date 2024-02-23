@@ -65,9 +65,9 @@ const useGets = (searchState: PositionsSearchState) => {
         //     searchState.sortDir,
         //   )
         // }
-        // setState({
-        //   positions: response.data ?? [],
-        // })
+        setState({
+          positions: response.data as Position[],
+        })
       }
     } catch (err) {
       console.error(err)

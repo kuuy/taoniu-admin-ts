@@ -14,12 +14,12 @@ import {store} from '~/src/store'
 import {createTheme} from '~/src/theme'
 import createEmotionCache from '~/src/utils/create-emotion-cache'
 import {AuthProvider, AuthConsumer} from '~/src/contexts/auth/jwt-context'
+import {MqttProvider, MqttConsumer} from '~/src/contexts/mqtt-context'
 import {SettingsProvider, SettingsConsumer} from '~/src/contexts/settings-context'
 import {SplashScreen} from '~/src/components/splash-screen'
 
 import 'react-quill/dist/quill.snow.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import '~/src/styles/globals.css'
 import '~/src/locales/i18n'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -40,38 +40,44 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           <AuthProvider>
             <AuthConsumer>
               {(auth) => (
-                <SettingsProvider>
-                  <SettingsConsumer>
-                    {(settings) => {
-                      const theme = createTheme({
-                        colorPreset: settings.colorPreset,
-                        contrast: settings.contrast,
-                        direction: settings.direction,
-                        paletteMode: settings.paletteMode,
-                        responsiveFontSizes: settings.responsiveFontSizes,
-                      })
-                      const {palette} = theme
+                <MqttProvider>
+                  <MqttConsumer>
+                    {(mqtt) => (
+                      <SettingsProvider>
+                        <SettingsConsumer>
+                          {(settings) => {
+                            const theme = createTheme({
+                              colorPreset: settings.colorPreset,
+                              contrast: settings.contrast,
+                              direction: settings.direction,
+                              paletteMode: settings.paletteMode,
+                              responsiveFontSizes: settings.responsiveFontSizes,
+                            })
+                            const {palette} = theme
 
-                      return (
-                        <ThemeProvider theme={theme}>
-                          <Head>
-                            <meta
-                              name="color-scheme"
-                              content={settings.paletteMode!}
-                            />
-                            <meta
-                              name="theme-color"
-                              content={palette.neutral[900]}
-                            />
-                          </Head>
-                          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                          <CssBaseline/>
-                          {auth.isInitialized ? getLayout(<Component {...pageProps} />) : <SplashScreen/>}
-                        </ThemeProvider>
-                      )
-                    }}
-                  </SettingsConsumer>
-                </SettingsProvider>
+                            return (
+                              <ThemeProvider theme={theme}>
+                                <Head>
+                                  <meta
+                                    name="color-scheme"
+                                    content={settings.paletteMode!}
+                                  />
+                                  <meta
+                                    name="theme-color"
+                                    content={palette.neutral[900]}
+                                  />
+                                </Head>
+                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                <CssBaseline/>
+                                {auth.isInitialized && mqtt.isInitialized ? getLayout(<Component {...pageProps} />) : <SplashScreen/>}
+                              </ThemeProvider>
+                            )
+                          }}
+                        </SettingsConsumer>
+                      </SettingsProvider>
+                    )}
+                  </MqttConsumer>
+                </MqttProvider>
               )}
             </AuthConsumer>
           </AuthProvider>

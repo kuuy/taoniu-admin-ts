@@ -13,10 +13,11 @@ import {IndicatorsResult} from '~/src/types/indicator'
 
 export interface TradingViewProps extends ChartingLibraryWidgetOptions {
   onIndicatorsLoading?: (symbol: string, interval: string, fields: string[]) => IndicatorsResult
+  onSymbolChanged?: (symbol: string) => void
 }
 
 export const TradingView = (props: Partial<TradingViewProps>) => {
-  const { onIndicatorsLoading } = props
+  const { onIndicatorsLoading, onSymbolChanged } = props
   const chartContainerRef = useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>
   const saveLoadAdapter = new SaveLoadAdapter()
 
@@ -68,7 +69,7 @@ export const TradingView = (props: Partial<TradingViewProps>) => {
       })
 
       const chart = tvWidget.activeChart()
-      // chart.onSymbolChanged().subscribe(null, () => {
+      chart.onSymbolChanged().subscribe(null, () => {
         // chart.getAllShapes().forEach((shape) => {
         //   if (shape.name === "horizontal_line") {
         //     const properties = chart.getShapeById(shape.id).getProperties()
@@ -77,9 +78,10 @@ export const TradingView = (props: Partial<TradingViewProps>) => {
         //     // chart.removeEntity(shape.id)
         //   }
         // })
-        // console.log('The symbol is changed', chart.symbol())
-        // console.log("symbol changed")
-      // })
+        onSymbolChanged?.(chart.symbol())
+        console.log('The symbol is changed', chart.symbol())
+        console.log("symbol changed")
+      })
 
       chart.onDataLoaded().subscribe(null, () => {
         const symbol = chart.symbol()

@@ -11,7 +11,7 @@ type CalcRequest = {
 }
 
 class PositionsApi {
-  async gets(request: GetsRequest): Promise<ApiResponse<Position>> {
+  async gets(request: GetsRequest): Promise<ApiResponse<Position[]>> {
     const { side } = request
 
     const params = new URLSearchParams()

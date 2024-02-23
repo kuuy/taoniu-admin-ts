@@ -15,7 +15,7 @@ const EXPIRED_AT_KEY = 'EXPIRED_AT'
 const initial = (): AppThunk => async (dispatch): Promise<void> => {
   const accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || ""
   if (accessToken === "") {
-    dispatch(slice.actions.initial(null))
+    dispatch(slice.actions.initial())
     return
   }
 

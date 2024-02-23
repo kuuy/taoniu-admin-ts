@@ -2,7 +2,9 @@ import type { TypographyOptions } from '@mui/material/styles/createTypography'
 import { Golos_Text } from 'next/font/google'
 
 const golosText = Golos_Text({
-  subsets: ["cyrillic", "latin"],
+  weight: ['400', '500', '600', '700'],
+  subsets: ['cyrillic', 'latin'],
+  display: 'swap',
 })
 
 export const createTypography = (): TypographyOptions => {

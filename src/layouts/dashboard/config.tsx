@@ -121,7 +121,97 @@ export const useSections = () => {
             items: [
               {
                 title: "Spot",
-                items: [],
+                items: [
+                  {
+                    title: "Tickers",
+                    items: [
+                      {
+                        title: "Ranking",
+                        path: "/cryptos/binance/spot/tickers/ranking",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Indicators",
+                    items: [
+                      {
+                        title: "Ranking",
+                        path: "/cryptos/binance/spot/indicators/ranking",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Strategies",
+                    items: [
+                      {
+                        title: "List",
+                        path: "/cryptos/binance/spot/strategies",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Plans",
+                    items: [
+                      {
+                        title: "List",
+                        path: "/cryptos/binance/spot/plans",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Positions",
+                    items: [
+                      {
+                        title: "List",
+                        path: "/cryptos/binance/spot/positions",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Orders",
+                    items: [
+                      {
+                        title: "List",
+                        path: "/cryptos/binance/spot/orders",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Scalping",
+                    items: [
+                      {
+                        title: "List",
+                        path: "/cryptos/binance/spot/scalping",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Triggers",
+                    items: [
+                      {
+                        title: "List",
+                        path: "/cryptos/binance/spot/triggers",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Tradings",
+                    items: [
+                      {
+                        title: "Scalping",
+                        path: "/cryptos/binance/spot/tradings/scalping",
+                      },
+                      {
+                        title: "Triggers",
+                        path: "/cryptos/binance/spot/tradings/triggers",
+                      },
+                      {
+                        title: "Chart",
+                        path: "/cryptos/binance/spot/tradings",
+                      },
+                    ],
+                  }
+                ],
               },
               {
                 title: "Futures",

@@ -1,5 +1,4 @@
-import type { PayloadAction } from '@reduxjs/toolkit'
-import {createSlice} from '@reduxjs/toolkit'
+import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
 import {
   JwtToken,
@@ -23,7 +22,7 @@ const initialState: JwtState = {
 }
 
 const reducers = {
-  initial(state: JwtState, action: InitialAction): void {
+  initial: (state: JwtState, action: InitialAction) => {
     const token = action.payload
     state.isInitialized = true
     if (token != null) {

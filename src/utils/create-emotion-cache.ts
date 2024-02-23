@@ -16,7 +16,7 @@ const getInsertionPoint = (): HTMLMetaElement | null => {
 export default function createEmotionCache(): EmotionCache {
   const insertionPoint = getInsertionPoint()
   const options: Options = {
-    key: 'mui',
+    key: 'taoniu-admin',
   }
   if (insertionPoint !== null) {
     options.insertionPoint = insertionPoint

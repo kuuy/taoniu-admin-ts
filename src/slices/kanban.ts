@@ -224,19 +224,19 @@ const reducers = {
     const checklist = task.checklists.find((_checklist) => _checklist.id === checklistId);
 
     if (!checklist) {
-      return;
+      return
     }
 
     checklist.checkItems = (
       checklist.checkItems.filter((checkItem) => checkItem.id !== checkItemId)
-    );
+    )
   }
-};
+}
 
 export const slice = createSlice({
   name: 'kanban',
   initialState,
   reducers
-});
+})
 
 export const { reducer } = slice;

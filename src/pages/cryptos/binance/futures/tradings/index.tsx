@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic'
 import Script from 'next/script'
 
 import {
-  ChartingLibraryWidgetOptions,
   ResolutionString,
 } from "~/public/assets/charting_library"
 import {NextPageWithLayout} from '~/src/pages/_app'
@@ -18,6 +17,8 @@ import {Trading} from '~/src/types/trading'
 import {useMounted} from '~/src/hooks/use-mounted'
 import {TradingDrawer} from '~/src/sections/dashboard/tradings/trading-drawer'
 import {appConfig} from '~/src/config'
+import {indicatorsApi} from '~/src/api/cryptos/binance/futures/indicators'
+import {TradingViewProps} from '~/src/components/charts/tradingview'
 
 interface Filters {
   query?: string;
@@ -96,17 +97,6 @@ const useTradings = (searchState: TradingsSearchState) => {
   return state
 }
 
-const defaultWidgetProps: Partial<ChartingLibraryWidgetOptions> = {
-  theme: "Dark",
-  symbol: "BTCUSDT",
-  interval: "1D" as ResolutionString,
-  library_path: `${appConfig.baseUrl}/assets/charting_library/`,
-  locale: "en",
-  datafeed_url: "/api/cryptos/v1/binance/futures/tradingview/datafeed",
-  fullscreen: false,
-  autosize: true,
-}
-
 const TradingView = dynamic(
   () =>
     import("~/src/components/charts/tradingview").then((mod) => mod.TradingView),
@@ -122,6 +112,57 @@ const Page:NextPageWithLayout = () => {
     data: ""
   })
   const [isScriptReady, setIsScriptReady] = useState(false)
+
+  const handleOnIndicatorsLoading = useCallback(
+    async (
+      symbol: string,
+      interval:string,
+      fields: string[],
+    ): Promise<any> => {
+      return new Promise((resolve, reject) => {
+        indicatorsApi.gets({
+          symbols: symbol,
+          interval: interval,
+          fields: fields.join(','),
+        }).then((response) => {
+          if (!response.success) {
+            throw new Error(response.error!)
+          }
+
+          const data = response.data![0].split(",").map((value) => {
+            return Number(value)
+          })
+
+          const indicators: Record<string, number> = {}
+          for (let i = 0; i < fields.length; i++) {
+            indicators[fields[i]] = data[i]
+          }
+
+          resolve(indicators)
+        }).catch((error) => {
+          reject(new Error("internal server error"))
+        })
+      })
+    },
+    [indicatorsApi],
+  )
+
+  const handleOnSymbolChange = (symbol: string) => {
+    window.localStorage.setItem("BINNACE_FUTURES_TRADINGVIEW_SYMBOL", symbol)
+  }
+
+  const tradingViewProps: Partial<TradingViewProps> = {
+    theme: "Dark",
+    symbol: window.localStorage.getItem("BINNACE_FUTURES_TRADINGVIEW_SYMBOL") || "BTCUSDT",
+    interval: "D" as ResolutionString,
+    library_path: `${appConfig.baseUrl}/assets/charting_library/`,
+    locale: "en",
+    datafeed_url: "/api/cryptos/v1/binance/futures/tradingview/datafeed",
+    fullscreen: false,
+    autosize: true,
+    onIndicatorsLoading: handleOnIndicatorsLoading,
+    onSymbolChanged: handleOnSymbolChange,
+  }
 
   const currentTrading = useMemo(() => {
     if (!drawer.data) {
@@ -251,7 +292,7 @@ const Page:NextPageWithLayout = () => {
                   setIsScriptReady(true)
                 }}
               />
-              {isScriptReady && <TradingView {...defaultWidgetProps} />}
+              {isScriptReady && <TradingView {...tradingViewProps} />}
             </Box>
             <Divider />
             <TradingListSearch

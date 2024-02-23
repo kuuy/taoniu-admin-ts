@@ -37,7 +37,7 @@ const initialState: ChatState = {
     byId: {},
     allIds: []
   }
-};
+}
 
 const reducers = {
   getContacts(state: ChatState, action: GetContactsAction): void {

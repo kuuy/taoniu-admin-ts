@@ -1,3 +1,7 @@
+export const mqttConfig = {
+  brokerUrl: process.env.NEXT_PUBLIC_MQTT_BROKER_URL || '',
+}
+
 export const appConfig = {
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL || '',
 }

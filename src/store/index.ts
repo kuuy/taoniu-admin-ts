@@ -10,7 +10,10 @@ import rootReducer from '~/src/store/root-reducer'
 
 export const store = configureStore({
   reducer: rootReducer,
-  devTools: process.env.REACT_APP_ENABLE_REDUX_DEV_TOOLS === 'true',
+  devTools: true,
+  middleware: (getDefaultMiddleware) => [
+    ...getDefaultMiddleware(),
+  ],
 })
 
 export type RootState = ReturnType<typeof store.getState>

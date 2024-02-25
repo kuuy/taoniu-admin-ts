@@ -1,6 +1,6 @@
+import {MqttClient} from 'mqtt'
 
 export interface MqttState {
   isInitialized: boolean
-  isConnected: boolean
-  topics: string[]
+  client: MqttClient | null
 }

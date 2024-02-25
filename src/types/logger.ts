@@ -1,5 +1,5 @@
 export interface LoggerState {
-  lever: string
+  level: string
   message: string
   data: any[]
 }

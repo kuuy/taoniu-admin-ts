@@ -8,16 +8,16 @@ const nextConfig = {
       transform: '@mui/icons-material/{{member}}'
     }
   },
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: `https://taoniu.kuuy.com/api/:path*`,
-        basePath: false
-      },
-    ]
-  },
-  // output: 'export',
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/api/:path*",
+  //       destination: `https://taoniu.kuuy.com/api/:path*`,
+  //       basePath: false
+  //     },
+  //   ]
+  // },
+  output: 'export',
   distDir: 'dist'
 }
 

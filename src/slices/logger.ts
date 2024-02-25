@@ -7,7 +7,7 @@ import {
 type PushAction = PayloadAction<LoggerState>
 
 const initialState: LoggerState = {
-  lever: "",
+  level: "",
   message: "",
   data: [],
 }
@@ -15,7 +15,7 @@ const initialState: LoggerState = {
 const reducers = {
   push: (state: LoggerState, action: PushAction) => {
     const { level, message, data } = action.payload;
-    state.lever = level
+    state.level = level
     state.message = message
     state.data = data
   },

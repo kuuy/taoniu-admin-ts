@@ -1,40 +1,42 @@
-import {ChangeEvent, MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import dynamic from 'next/dynamic'
-import Script from 'next/script'
+import Head from 'next/head'
+import {ChangeEvent, MouseEvent, MutableRefObject, useCallback, useEffect, useMemo, useRef, useState} from 'react'
+
+import {Box, Button, Container, Divider, Stack, SvgIcon, Typography} from '@mui/material'
+import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus'
 
 import {NextPageWithLayout} from '~/src/pages/_app'
 import DashboardLayout from '~/src/layouts/dashboard'
-import Head from 'next/head'
-import {Box, Button, Container, Divider, Stack, SvgIcon, Typography} from '@mui/material'
 
 import {RankingContainer} from '~/src/sections/binance/spot/tickers/ranking-container'
 import {RankingListTable} from '~/src/sections/binance/spot/tickers/ranking-list-table'
 import {RankingListSearch} from '~/src/sections/binance/spot/tickers/ranking-list-search'
-import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus'
-import {useMounted} from '~/src/hooks/use-mounted'
+import {useMqtt} from '~/src/hooks/use-mqtt'
 import {tickersApi} from '~/src/api/cryptos/binance/spot/tickers'
+import logger from '~/src/thunks/logger'
+import {useDispatch} from '~/src/store'
+import {MqttClient} from 'mqtt'
 
 interface Filters {
-  query?: string;
-  interval?: string;
+  query?: string
+  interval?: string
 }
 
-type SortDir = 'asc' | 'desc';
+type SortDir = 'asc' | 'desc'
 
 interface RankingSearchState {
-  filters: Filters;
-  page: number;
-  rowsPerPage: number;
-  sortBy?: string;
-  sortDir?: SortDir;
+  filters: Filters
+  page: number
+  rowsPerPage: number
+  sortBy?: string
+  sortDir?: SortDir
 }
 
 interface RankingSearchState {
-  filters: Filters;
-  page: number;
-  rowsPerPage: number;
-  sortBy?: string;
-  sortDir?: SortDir;
+  filters: Filters
+  page: number
+  rowsPerPage: number
+  sortBy?: string
+  sortDir?: SortDir
 }
 
 const useSearch = () => {
@@ -56,8 +58,8 @@ const useSearch = () => {
 }
 
 interface RankingStoreState {
-  ranking: string[];
-  rankingCount: number;
+  ranking: string[]
+  rankingCount: number
 }
 
 const fields = [
@@ -70,58 +72,63 @@ const fields = [
   "change",
 ]
 
-const useRanking = (searchState: RankingSearchState) => {
-  const isMounted = useMounted()
-  const [state, setState] = useState<RankingStoreState>({
+const Page:NextPageWithLayout = () => {
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  const [rankingState, setRankingState] = useState<RankingStoreState>({
     ranking: [],
     rankingCount: 0
   })
-  // const { subscribe } = useSocket()
-
-  const getRanking = useCallback(async () => {
-    try {
-      const response = await tickersApi.ranking({
-        symbols: undefined,
-        fields: fields.join(','),
-        sort: "change,-1",
-        current: 1,
-        pageSize: 100,
-      })
-      if (isMounted()) {
-        // subscribe("/binance/spot", {
-        //   "topic": "tickers",
-        //   "symbols": [
-        //     "MAGICUSDT",
-        //     "QTUMUSDT",
-        //   ]
-        // })
-        setState({
-          ranking: response.data ?? [],
-          rankingCount: response.total ?? 0
-        })
-      }
-    } catch (err) {
-      console.error(err)
-    }
-  }, [searchState, isMounted])
-
-  useEffect(() => {
-      getRanking()
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchState])
-
-  return state
-}
-
-const Page:NextPageWithLayout = () => {
-  const rootRef = useRef<HTMLDivElement | null>(null)
   const { search, updateSearch } = useSearch()
-  const { ranking, rankingCount } = useRanking(search)
   const [drawer, setDrawer] = useState({
     isOpen: false,
     data: ""
   })
+  const mqtt = useMqtt()
+  const isMounted = useRef(false)
+
+  useEffect(() => {
+    if (!isMounted.current) {
+      loadRanking()
+      isMounted.current = true
+    }
+  }, [mqtt])
+
+  const loadRanking = useCallback(async (): Promise<void> => {
+    tickersApi.ranking({
+      symbols: undefined,
+      fields: fields.join(','),
+      sort: "change,-1",
+      current: 1,
+      pageSize: 100,
+    }).then((response) => {
+      if (!response.success) {
+        throw new Error(response.error!)
+      }
+      setRankingState({
+        ranking: response.data ?? [],
+        rankingCount: response.total ?? 0,
+      })
+      const topics: string[] = []
+      response.data?.map((data) => {
+        const values = data.split(",")
+        const symbol = values.shift()
+        topics.push(`binance/spot/tickers/${symbol}`)
+      })
+      const interval = setInterval(() => {
+        if (mqtt.client?.connected) {
+          response.data?.map((data) => {
+            const values = data.split(",")
+            const symbol = values.shift()
+            mqtt.client?.subscribe(`binance/spot/tickers/${symbol}`)
+          })
+          clearInterval(interval)
+        }
+      }, 5000)
+      return () => clearInterval(interval)
+    }).catch((err) => {
+      console.error(err)
+    })
+  }, [])
 
   const handleFiltersChange = useCallback((filters: Filters) => {
     setDrawer({
@@ -267,8 +274,8 @@ const Page:NextPageWithLayout = () => {
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               fields={fields || []}
-              ranking={ranking || []}
-              rankingCount={rankingCount}
+              ranking={rankingState.ranking || []}
+              rankingCount={rankingState.rankingCount}
               page={search.page}
               rowsPerPage={search.rowsPerPage}
             />

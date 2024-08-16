@@ -49,11 +49,19 @@ export const RankingListTable: FC<RankingListTableProps> = (props) => {
             <TableCell width="200">
               Symbol
             </TableCell>
-            {fields.map((field, i) => (
-              <TableCell key={i}>
-                {field}
-              </TableCell>
-            ))}
+            {fields.map((field, i) => {
+              if (field == "slippage_percent@1%") {
+                field = "slippage@1%"
+              }
+              if (field == "slippage_percent@2%") {
+                field = "slippage@2%"
+              }
+              return (
+                <TableCell key={i}>
+                  {field}
+                </TableCell>
+              )
+            })}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -74,7 +82,7 @@ export const RankingListTable: FC<RankingListTableProps> = (props) => {
                   </Typography>
                 </TableCell>
                 {values.map((value, i) => {
-                  if (fields[i] == "change") {
+                  if (fields[i] == "change" || fields[i] == "slippage_percent@1%" || fields[i] == "slippage_percent@2%") {
                     value = `${(Number(value) * 100).toFixed(2)}%`
                   }
                   return (

@@ -1,5 +1,6 @@
 import * as crypto from 'crypto'
 import {api, ApiResponse} from '~/src/utils/api'
+import {jwe} from '~/src/utils/jwe'
 
 type TokenInfo = {
   access_token: string
@@ -14,17 +15,19 @@ type SignInParams = {
 class JwtApi {
   async signIn(params: SignInParams): Promise<ApiResponse<TokenInfo>> {
     const { email, password } = params
-    const formData = new FormData()
-    formData.set("email", email)
-    formData.set("password", crypto.createHash('md5').update(password).digest("hex"))
-    return api.post('/api/account/v1/login', null, formData)
+    const payload = await jwe.encrypt(JSON.stringify({
+      "email": email,
+      "password": crypto.createHash('md5').update(password).digest("hex"),
+    }))
+    return api.post('/api/account/v1/login', null, new TextEncoder().encode(payload))
   }
 
   async refresh(): Promise<ApiResponse<TokenInfo>> {
     const refreshToken = window.localStorage.getItem("REFRESH_TOKEN") || ""
-    const formData = new FormData()
-    formData.set("refresh_token", refreshToken)
-    return api.post('/api/account/v1/token/refresh', null, formData)
+    const payload = await jwe.encrypt(JSON.stringify({
+      "refresh_token": refreshToken,
+    }))
+    return api.post('/api/account/v1/token/refresh', null, new TextEncoder().encode(payload))
   }
 }
 

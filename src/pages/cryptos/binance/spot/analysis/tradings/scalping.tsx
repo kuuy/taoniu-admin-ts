@@ -5,14 +5,15 @@ import DashboardLayout from '~/src/layouts/dashboard'
 import Head from 'next/head'
 import {Box, Button, Container, Divider, Stack, SvgIcon, Typography} from '@mui/material'
 
-import {PositionContainer} from '~/src/sections/binance/spot/positions/position-container'
-import {PositionListTable} from '~/src/sections/binance/spot/positions/position-list-table'
-import {PositionListSearch} from '~/src/sections/binance/spot/positions/position-list-search'
+import {ScalpingContainer} from '~/src/sections/binance/spot/analysis/tradings/scalping-container'
+import {ScalpingListTable} from '~/src/sections/binance/spot/analysis/tradings/scalping-list-table'
+import {ScalpingListSearch} from '~/src/sections/binance/spot/analysis/tradings/scalping-list-search'
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus'
 import {useMounted} from '~/src/hooks/use-mounted'
-import {positionsApi} from '~/src/api/cryptos/binance/spot/positions'
-import {Position} from '~/src/types/position'
+import {scalpingApi} from '~/src/api/cryptos/binance/spot/analysis/tradings/scalping'
+import {Scalping} from '~/src/types/binance/spot/analysis/tradings/scalping'
 import {applySort} from '~/src/utils/apply-sort'
+import {Order} from '~/src/types/binance/futures/order'
 
 interface Filters {
   query?: string
@@ -20,14 +21,14 @@ interface Filters {
 
 type SortDir = 'asc' | 'desc';
 
-interface PositionsSearchState {
+interface ScalpingsSearchState {
   filters: Filters;
   sortBy?: string;
   sortDir?: SortDir;
 }
 
 const useSearch = () => {
-  const [search, setSearch] = useState<PositionsSearchState>({
+  const [search, setSearch] = useState<ScalpingsSearchState>({
     filters: {
       query: undefined,
     },
@@ -41,19 +42,22 @@ const useSearch = () => {
   }
 }
 
-interface PositionStoreState {
-  positions: Position[];
+interface ScalpingStoreState {
+  scalping: Scalping[];
 }
 
-const useGets = (searchState: PositionsSearchState) => {
+const useGets = (searchState: ScalpingsSearchState) => {
   const isMounted = useMounted();
-  const [state, setState] = useState<PositionStoreState>({
-    positions: [],
+  const [state, setState] = useState<ScalpingStoreState>({
+    scalping: [],
   })
 
-  const gets = useCallback(async () => {
+  const listings = useCallback(async () => {
     try {
-      const response = await positionsApi.gets()
+      const response = await scalpingApi.listings({
+        current: 1,
+        pageSize: 50,
+      })
       if (isMounted()) {
         // if (typeof searchState.sortBy !== 'undefined' && typeof searchState.sortDir !== 'undefined') {
         //   response.data = applySort(
@@ -63,7 +67,7 @@ const useGets = (searchState: PositionsSearchState) => {
         //   )
         // }
         setState({
-          positions: applySort(response.data ?? [], "entry_amount", "desc"),
+          scalping: (response.data ?? []) as Scalping[],
         })
       }
     } catch (err) {
@@ -72,7 +76,7 @@ const useGets = (searchState: PositionsSearchState) => {
   }, [searchState, isMounted])
 
   useEffect(() => {
-      gets()
+      listings()
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [searchState],
@@ -84,7 +88,7 @@ const useGets = (searchState: PositionsSearchState) => {
 const Page:NextPageWithLayout = () => {
   const rootRef = useRef<HTMLDivElement | null>(null)
   const { search, updateSearch } = useSearch()
-  const { positions } = useGets(search)
+  const { scalping } = useGets(search)
   const [drawer, setDrawer] = useState({
     isOpen: false,
     data: ""
@@ -115,7 +119,7 @@ const Page:NextPageWithLayout = () => {
     }))
   }, [updateSearch])
 
-  const handlePositionOpen = useCallback((indicatorId: string) => {
+  const handleScalpingOpen = useCallback((indicatorId: string) => {
     // Close drawer if is the same indicator
 
     if (drawer.isOpen && drawer.data === indicatorId) {
@@ -132,7 +136,7 @@ const Page:NextPageWithLayout = () => {
     })
   }, [drawer])
 
-  const handlePositionClose = useCallback(() => {
+  const handleScalpingClose = useCallback(() => {
     setDrawer({
       isOpen: false,
       data: ""
@@ -143,7 +147,7 @@ const Page:NextPageWithLayout = () => {
     <>
       <Head>
         <title>
-          Dashboard: Position List | Taoniu
+          Dashboard: Scalping List | Taoniu
         </title>
       </Head>
       <Divider />
@@ -167,7 +171,7 @@ const Page:NextPageWithLayout = () => {
             top: 0
           }}
         >
-          <PositionContainer>
+          <ScalpingContainer>
             <Box sx={{ p: 3 }}>
               <Stack
                 alignItems="flex-start"
@@ -177,7 +181,7 @@ const Page:NextPageWithLayout = () => {
               >
                 <div>
                   <Typography variant="h4">
-                    Positions List
+                    Scalpings List
                   </Typography>
                 </div>
                 <div>
@@ -202,7 +206,7 @@ const Page:NextPageWithLayout = () => {
               spacing={4}
               sx={{ pr: 3 }}
             >
-              <PositionListSearch
+              <ScalpingListSearch
                 onFiltersChange={handleFiltersChange}
                 onSortChange={handleSortChange}
                 sortBy=""
@@ -222,12 +226,12 @@ const Page:NextPageWithLayout = () => {
               </Box>
             </Stack>
             <Divider />
-            <PositionListTable
-              onPositionSelect={handlePositionOpen}
+            <ScalpingListTable
+              onScalpingSelect={handleScalpingOpen}
               onRowsPerPageChange={handleRowsPerPageChange}
-              positions={positions ?? []}
+              scalping={scalping ?? []}
             />
-          </PositionContainer>
+          </ScalpingContainer>
         </Box>
       </Box>
     </>
@@ -238,6 +242,6 @@ Page.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
-);
+)
 
-export default Page;
+export default Page

@@ -70,6 +70,8 @@ const fields = [
   "volume",
   "quota",
   "change",
+  "slippage_percent@1%",
+  "slippage_percent@2%",
 ]
 
 const Page:NextPageWithLayout = () => {
@@ -190,7 +192,7 @@ const Page:NextPageWithLayout = () => {
     <>
       <Head>
         <title>
-          Dashboard: Ranking List | Devias Kit PRO
+          Dashboard: Tickers Ranking List | Devias Kit PRO
         </title>
       </Head>
       <Divider />
@@ -290,6 +292,6 @@ Page.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
-);
+)
 
-export default Page;
+export default Page

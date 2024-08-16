@@ -1,3 +1,9 @@
+import {jwe} from '~/src/utils/jwe'
+
+export interface JweResponse {
+  payload: string
+}
+
 export interface ApiResponse<T> {
   success: boolean
   error?: string
@@ -41,7 +47,10 @@ export const api = {
       throw new Error('Failed Request Api')
     }
 
-    return response.json()
+    const jweCompact = await response.text()
+    const payload = await jwe.decrypt(jweCompact)
+
+    return JSON.parse(payload)
   },
   async get<T = void>(
     path: string,
@@ -58,7 +67,7 @@ export const api = {
   async post<T = void>(
     path: string,
     params: URLSearchParams | null,
-    body: FormData,
+    body: FormData | ArrayBuffer,
   ): Promise<ApiResponse<T>> {
     return this.request('POST', path, params, {
       body: body,

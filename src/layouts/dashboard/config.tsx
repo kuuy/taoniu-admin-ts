@@ -123,6 +123,20 @@ export const useSections = () => {
                 title: "Spot",
                 items: [
                   {
+                    title: "Analysis",
+                    items: [
+                      {
+                        title: "Tradings",
+                        items: [
+                          {
+                            title: "Scalping",
+                            path: "/cryptos/binance/spot/analysis/tradings/scalping",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  {
                     title: "Tickers",
                     items: [
                       {

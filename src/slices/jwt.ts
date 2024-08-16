@@ -22,25 +22,25 @@ const initialState: JwtState = {
 }
 
 const reducers = {
-  initial: (state: JwtState, action: InitialAction) => {
-    const token = action.payload
+  initial: (state: JwtState, { payload } : InitialAction) => {
+    const token = payload
     state.isInitialized = true
     if (token != null) {
       state.isAuthenticated = true
       state.token = token
     }
   },
-  signIn(state: JwtState, action: SignInAction): void {
-    const token = action.payload
+  signIn(state: JwtState, { payload }: SignInAction): void {
+    const token = payload
     state.isAuthenticated = true
     state.token = token
   },
-  signOut(state: JwtState, action: SignOutAction): void {
+  signOut(state: JwtState): void {
     state.isAuthenticated = false
     state.token = null
   },
-  refresh(state: JwtState, action: RefreshAction): void {
-    const { accessToken, refreshedAt } = action.payload
+  refresh(state: JwtState, { payload }: RefreshAction): void {
+    const { accessToken, refreshedAt } = payload
     state.token!.access = accessToken
     state.token!.refreshedAt = refreshedAt
   }

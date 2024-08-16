@@ -68,6 +68,8 @@ const fields = [
   "volume",
   "quota",
   "change",
+  "slippage_percent@1%",
+  "slippage_percent@2%",
 ]
 
 const useRanking = (searchState: RankingSearchState) => {

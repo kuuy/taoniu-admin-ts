@@ -5,13 +5,14 @@ import DashboardLayout from '~/src/layouts/dashboard'
 import Head from 'next/head'
 import {Box, Button, Container, Divider, Stack, SvgIcon, Typography} from '@mui/material'
 
-import {PositionContainer} from '~/src/sections/dashboard/positions/position-container'
-import {PositionListTable} from '~/src/sections/dashboard/positions/position-list-table'
-import {PositionListSearch} from '~/src/sections/dashboard/positions/position-list-search'
+import {PositionContainer} from '~/src/sections/binance/futures/positions/position-container'
+import {PositionListTable} from '~/src/sections/binance/futures/positions/position-list-table'
+import {PositionListSearch} from '~/src/sections/binance/futures/positions/position-list-search'
 import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus'
 import {useMounted} from '~/src/hooks/use-mounted'
 import {positionsApi} from '~/src/api/cryptos/binance/futures/positions'
 import {Position} from '~/src/types/position'
+import {applySort} from '~/src/utils/apply-sort'
 
 interface Filters {
   query?: string;
@@ -66,7 +67,7 @@ const useGets = (searchState: PositionsSearchState) => {
         //   )
         // }
         setState({
-          positions: response.data as Position[],
+          positions: applySort(response.data ?? [], "entry_amount", "desc"),
         })
       }
     } catch (err) {

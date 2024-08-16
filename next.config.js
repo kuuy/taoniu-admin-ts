@@ -11,8 +11,8 @@ const nextConfig = {
   // async rewrites() {
   //   return [
   //     {
-  //       source: "/api/:path*",
-  //       destination: `https://taoniu.kuuy.com/api/:path*`,
+  //       source: "/api/account/:path*",
+  //       destination: `http://127.0.0.1:5800/:path*`,
   //       basePath: false
   //     },
   //   ]
